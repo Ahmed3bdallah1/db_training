@@ -20,7 +20,7 @@ class UpdateNoteProvider extends StatelessWidget {
     return Consumer<DatabaseProvider>(
       builder: (context, provider, _) {
         return Scaffold(
-          appBar: AppBar(title: const Text("Add notes"), centerTitle: true),
+          appBar: AppBar(title: const Text("Update notes"), centerTitle: true),
           body: Form(
             key: formKey,
             child: Padding(
@@ -61,10 +61,7 @@ class UpdateNoteProvider extends StatelessWidget {
                         if (title.text.isNotEmpty &&
                             description.text.isNotEmpty) {
                           provider.update(
-                            context,
-                            id: id,
-                            title: title.text,
-                            description: description.text,
+                            context, id, title.text, description.text,
                           );
                         }
                       },

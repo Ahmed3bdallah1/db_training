@@ -2,50 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-
+import '../../managers/values.dart';
 
 // this folder can be used with provider and riverpod
 
 class DatabaseProvider extends ChangeNotifier {
-  static DatabaseProvider get(BuildContext context) => Provider.of(context);
+  static DatabaseProvider get(BuildContext context) => Provider.of<DatabaseProvider>(context,listen: false);
 
-  Database? _database;
+  Database? database;
 
-  List<Map<String, dynamic>> _notes = [];
-
-  List<Map<String, dynamic>> get notes => _notes;
-
-  Future<void> createDatabase() async {
-    final database = await openDatabase(
+  void createDatabase() {
+    openDatabase(
       "Notes.db",
       version: 1,
-      onCreate: (db, version) async {
+      onCreate: (database, version) {
         print("Database created");
-        await db.execute('''
-          CREATE TABLE Notes (
-            id INTEGER PRIMARY KEY,
-            title TEXT,
-            description TEXT
-          )
-        ''');
-        print("Notes table created");
+        database.execute('''
+        CREATE TABLE Notes (
+          id INTEGER PRIMARY KEY,
+          title TEXT,
+          description TEXT
+        )
+      ''').then((value) {
+          print("Notes table created");
+        }).catchError((error) {
+          print("Error in creating Notes table: $error");
+        });
       },
-      onOpen: (db) async {
+      onOpen: (database) {
         print("Got database");
-        _database = db;
-        await getDatabase();
+        getDatabase(database);
       },
-    );
-    _database = database;
-    notifyListeners();
+    ).then((value) {
+      database = value;
+    }).catchError((error) {});
   }
 
-  Future<void> addNote({
-    required BuildContext context,
-    required String title,
-    required String description,
-  }) async {
-    _database!.transaction((txn) {
+  Future<void> addNote(
+      {required String title, required String description, required BuildContext context}) async {
+    database!.transaction((txn) {
       final values = {
         "title": title,
         "description": description,
@@ -53,59 +48,49 @@ class DatabaseProvider extends ChangeNotifier {
 
       return txn.insert("Notes", values).then((value) {
         print("item $value created ");
-        getDatabase();
+        getDatabase(database!);
         Navigator.pop(context);
       }).catchError((error) {
         print(error);
       });
     });
-    notifyListeners();
   }
 
-  Future<void> getDatabase() async {
-    try {
-      final value = await _database!.query("Notes");
-      _notes = value;
-      print("got the database items");
-      print("notes list length ${_notes.length}");
-    } catch (error) {
+  void getDatabase(Database database) {
+    database.query("Notes").then((value) {
+      notes = [];
+      for (var element in value) {
+        notes.add(element);
+      }
+      notifyListeners();
+      print("got the data base items ");
+      print("notes list length ${notes.length}");
+    }).catchError((error) {
       print("error $error");
-    }
-    notifyListeners();
+    });
   }
 
-  Future<void> deleteNote(BuildContext context, {required int id}) async {
-    try {
-      final value =
-          await _database!.delete("Notes", where: "id = ?", whereArgs: [id]);
+  Future<void> deleteNote({required BuildContext context, required int id}) async {
+    database!.delete("Notes", where: "id = ?", whereArgs: [id]).then((value) {
       print("Note number $value deleted");
-      await getDatabase();
-      Navigator.pop(context);
-    } catch (error) {
+      getDatabase(database!);
+    }).catchError((error) {
       print(error);
-    }
-    notifyListeners();
+    });
   }
 
-  Future<void> update(BuildContext context,
-      {required int id,
-      required String title,
-      required String description}) async {
+  Future<void> update(BuildContext context,int id, String title, String description) async {
     final data = {
       "title": title,
       "description": description,
     };
+    database!.database
+        .update("Notes", data, where: "id = ?", whereArgs: [id]).then((value) {
+          print(id);
+          print("updated");
 
-    try {
-      final value = await _database!
-          .update("Notes", data, where: "id = ?", whereArgs: [id]);
-      print("Note number $value updated");
-      await getDatabase();
-      Navigator.pop(context);
-      notifyListeners();
-    } catch (error) {
-      print(error);
-    }
-    notifyListeners();
+    });
+
+    getDatabase(database!);
   }
 }

@@ -5,6 +5,8 @@ import 'package:db/screens/widgets/item_container_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/managers/values.dart';
+
 class NotesProviderScreen extends StatelessWidget {
   const NotesProviderScreen({super.key});
 
@@ -12,8 +14,6 @@ class NotesProviderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<DatabaseProvider>(
       builder: (context,provider,_){
-        provider.getDatabase();
-        var notes= provider.notes;
         if (notes.isEmpty) {
           return Scaffold(
             appBar: AppBar(
@@ -38,27 +38,29 @@ class NotesProviderScreen extends StatelessWidget {
             title: const Text("Notes"),
             centerTitle: true,
           ),
-          body: Column(
-            children: [
-              SizedBox(
-                height: 200,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 5,
-                      mainAxisSpacing: 5,
-                    ),
-                    itemCount: notes.length,
-                    itemBuilder: (context, index) {
-                      return itemContainerProvider(context, notes[index]);
-                    },
-                  ),
-                ),
-              ),
-              ExpandedTasks(notes: notes)
-            ],
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                // SizedBox(
+                //   height: 200,
+                //   child: Padding(
+                //     padding: const EdgeInsets.symmetric(horizontal: 5),
+                //     child: GridView.builder(
+                //       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                //         crossAxisCount: 2,
+                //         crossAxisSpacing: 5,
+                //         mainAxisSpacing: 5,
+                //       ),
+                //       itemCount: notes.length,
+                //       itemBuilder: (context, index) {
+                //         return itemContainerProvider(context, notes[index]);
+                //       },
+                //     ),
+                //   ),
+                // ),
+                ExpandedTasks(notes: notes)
+              ],
+            ),
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {

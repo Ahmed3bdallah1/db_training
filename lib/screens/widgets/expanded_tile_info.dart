@@ -9,7 +9,7 @@ import '../../core/managers/values.dart';
 import 'expanded_tile.dart';
 
 class ExpandedTasks extends StatelessWidget {
-  final List<Map<String, dynamic>> notes;
+  final List<Map> notes;
 
   const ExpandedTasks({super.key, required this.notes});
 
@@ -63,7 +63,7 @@ class ExpandedTasks extends StatelessWidget {
                                 onPressed: () {
                                   context
                                       .read<DatabaseProvider>()
-                                      .deleteNote(context, id: todo["id"]);
+                                      .deleteNote(context: context, id: todo["id"]);
                                   Navigator.pop(context);
                                 },
                                 child: const Text('ok')),

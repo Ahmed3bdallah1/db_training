@@ -1,6 +1,7 @@
 import 'package:db/core/controllers/cubit/db_cubit.dart';
 import 'package:db/core/controllers/provider/database_provider.dart';
 import 'package:db/screens/modules/cubit_modules/notes_screen.dart';
+import 'package:db/screens/modules/provider_modules/notes_provider_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: const NotesScreen(),
+          home: const NotesProviderScreen(),
       ),
     );
   }
